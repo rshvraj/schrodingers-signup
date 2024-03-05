@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const SignupForm = () => {
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,16 +22,24 @@ const SignupForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/signup', {
+      const response = await axios.post('/api/auth/signup', {
         username,
         email,
         password,
       });
       const data = await response.data;
-      console.log(data); // Handle success message or redirect
+      console.log(data);
+      if (data.success === false) {
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
+      setLoading(false);
+      setError(null); 
     } catch (error) {
-      console.error(error); // Handle error message
-    }
+        setLoading(false);
+        setError(error.message);
+      }
   };
 
   return (
