@@ -25,7 +25,13 @@ const SigninForm = () => {
 
     // Validate form fields
     if (!email || !password) {
-      toast.error('All fields are required');
+      toast.error('Email and password are required');
+      return;
+    }
+
+    // Check if offline, save data to local storage, and return
+    if (!isOnline) {
+      toast.error('Cannot sign in while offline. Please try again when online.');
       return;
     }
 
@@ -36,11 +42,13 @@ const SigninForm = () => {
         password,
       });
       const data = await response.data;
-      console.log(data);
+
       if (data.success === false) {
         setError(data.message);
       } else {
         toast.success('Signin successful!');
+        // Clear offline signin data from local storage on successful signin
+        localStorage.removeItem('offlineSigninData');
       }
     } catch (error) {
       setError(error.message);
@@ -55,7 +63,7 @@ const SigninForm = () => {
         {isOnline ? 'Online' : 'Offline'}
       </div>
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-md shadow-md max-w-md">
-        <label htmlFor="email" className="block mb-2 font-bold">
+      <label htmlFor="email" className="block mb-2 font-bold">
           Email:
         </label>
         <input
