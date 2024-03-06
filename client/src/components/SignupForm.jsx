@@ -22,7 +22,7 @@ const SignupForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/auth/signup', {
+      const response = await axios.post('https://schrodingers-signup.onrender.com/auth/signup', {
         username,
         email,
         password,
