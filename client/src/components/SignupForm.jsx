@@ -109,7 +109,7 @@ const SignupForm = () => {
         />
         <button
           type="submit"
-          disabled={!isOnline || loading}
+        //   disabled={!isOnline || loading}
           className={`w-full py-2 rounded-md font-bold text-center ${
             isOnline ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-700'
           }`}
