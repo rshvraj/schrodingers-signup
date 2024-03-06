@@ -2,19 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link, useNavigate } from 'react-router-dom';
 
-
-const SignupForm = () => {
-
+const SigninForm = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const navigate = useNavigate();
-
 
   useEffect(() => {
     const handleOnlineChange = () => setIsOnline(navigator.onLine);
@@ -30,15 +24,14 @@ const SignupForm = () => {
     e.preventDefault();
 
     // Validate form fields
-    if (!username || !email || !password) {
+    if (!email || !password) {
       toast.error('All fields are required');
       return;
     }
 
     try {
       setLoading(true);
-      const response = await axios.post('https://schrodingers-signup.onrender.com/auth/signup', {
-        username,
+      const response = await axios.post('https://schrodingers-signup.onrender.com/auth/signin', {
         email,
         password,
       });
@@ -47,10 +40,8 @@ const SignupForm = () => {
       if (data.success === false) {
         setError(data.message);
       } else {
-        toast.success('User created successfully!');
+        toast.success('Signin successful!');
       }
-      navigate('/sign-in');
-
     } catch (error) {
       setError(error.message);
     } finally {
@@ -59,22 +50,11 @@ const SignupForm = () => {
   };
 
   return (
-    <div className="signup-form-container flex justify-center items-center h-screen bg-gray-100">
+    <div className="signin-form-container flex justify-center items-center h-screen bg-gray-100">
       <div className={`w-16 p-2 text-white text-center mr-4 ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}>
         {isOnline ? 'Online' : 'Offline'}
       </div>
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-md shadow-md max-w-md">
-      <label htmlFor="username" className="block mb-2 font-bold">
-          Username:
-        </label>
-        <input
-          type="text"
-          id="username"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
         <label htmlFor="email" className="block mb-2 font-bold">
           Email:
         </label>
@@ -104,7 +84,7 @@ const SignupForm = () => {
             isOnline ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-700'
           }`}
         >
-          {loading ? 'Signing Up...' : isOnline ? 'Sign Up' : 'Offline Signup'}
+          {loading ? 'Signing In...' : isOnline ? 'Sign In' : 'Offline Signin'}
         </button>
       </form>
       <ToastContainer />
@@ -112,4 +92,4 @@ const SignupForm = () => {
   );
 };
 
-export default SignupForm;
+export default SigninForm;
