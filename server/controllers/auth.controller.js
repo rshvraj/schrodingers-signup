@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
+import isOnline from "is-online";
 
 let signupQueue = [];
 
@@ -24,21 +25,22 @@ const saveUserToDatabase = async (username, email, password) => {
 };
 
 export const signup = async (req, res, next) => {
-  const { username, email, password } = req.body;
-  if (navigator.onLine) {
-    try {
-      // Process signup request immediately if online
+  try {
+    const isOnlineStatus = await isOnline();
+    const { username, email, password } = req.body;
+
+    if (isOnlineStatus) {
       await saveUserToDatabase(username, email, password);
       res.status(201).json("User created successfully!");
-    } catch (error) {
-      next(error);
+    } else {
+      // Queue signup request if offline
+      signupQueue.push({ username, email, password });
+      res
+        .status(200)
+        .json("Signup request queued. User will be created when back online.");
     }
-  } else {
-    // Queue signup request if offline
-    signupQueue.push({ username, email, password });
-    res
-      .status(200)
-      .json("Signup request queued. User will be created when back online.");
+  } catch (error) {
+    next(error);
   }
 };
 
