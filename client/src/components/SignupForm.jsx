@@ -44,6 +44,9 @@ const SignupForm = () => {
 
   return (
     <div className="signup-form-container flex justify-center items-center h-screen bg-gray-100">
+        <div className={`w-16 p-2 text-white text-center mr-4 ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}>
+        {isOnline ? 'Online' : 'Offline'}
+      </div>
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-md shadow-md max-w-md">
         <label htmlFor="username" className="block mb-2 font-bold">
           Username:
@@ -80,7 +83,7 @@ const SignupForm = () => {
         />
         <button
           type="submit"
-          disabled={!isOnline}
+          
           className={`w-full py-2 rounded-md font-bold text-center ${
             isOnline ? 'bg-blue-500 text-white' : 'bg-gray-400 text-gray-700'
           }`}
