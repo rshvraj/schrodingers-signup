@@ -2,29 +2,34 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Link, useNavigate } from 'react-router-dom';
-
 
 const SignupForm = () => {
-
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const navigate = useNavigate();
-
 
   useEffect(() => {
     const handleOnlineChange = () => setIsOnline(navigator.onLine);
     window.addEventListener('online', handleOnlineChange);
     window.addEventListener('offline', handleOnlineChange);
+
+    // Load offline data from local storage
+    const offlineSignupData = localStorage.getItem('offlineSignupData');
+    if (offlineSignupData && !isOnline) {
+      const { username, email, password } = JSON.parse(offlineSignupData);
+      setUsername(username);
+      setEmail(email);
+      setPassword(password);
+    }
+
     return () => {
       window.removeEventListener('online', handleOnlineChange);
       window.removeEventListener('offline', handleOnlineChange);
     };
-  }, []);
+  }, [isOnline]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,20 +42,25 @@ const SignupForm = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post('https://schrodingers-signup.onrender.com/auth/signup', {
-        username,
-        email,
-        password,
-      });
-      const data = await response.data;
-      console.log(data);
-      if (data.success === false) {
-        setError(data.message);
-      } else {
-        toast.success('User created successfully!');
-      }
-      navigate('/sign-in');
 
+      // If online, submit the form immediately
+      if (isOnline) {
+        const response = await axios.post('https://schrodingers-signup.onrender.com/auth/signup', {
+          username,
+          email,
+          password,
+        });
+        const data = await response.data;
+        if (data.success === false) {
+          setError(data.message);
+        } else {
+          toast.success('User created successfully!');
+        }
+      } else {
+        // If offline, save form data to local storage
+        localStorage.setItem('offlineSignupData', JSON.stringify({ username, email, password }));
+        toast.info('Signup request queued. User will be created when back online.');
+      }
     } catch (error) {
       setError(error.message);
     } finally {
